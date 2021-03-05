@@ -124,3 +124,6 @@ STATIC_URL = '/static/'
 
 SHARED_SECRET = "change_me"
 SHARED_SECRET_TIME_DELTA = 5
+
+BBB_URL = ""
+BBB_SECRET = ""
