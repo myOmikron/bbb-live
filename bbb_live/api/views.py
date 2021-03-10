@@ -5,7 +5,7 @@ import subprocess
 import sys
 
 from django.http import JsonResponse
-from django.views.generic import TemplateView
+from django.views.generic.base import View
 from rc_protocol import validate_checksum
 
 from api.models import Streaming
@@ -33,7 +33,7 @@ def check_required_parameter(param_list, data):
     return {"success": True}
 
 
-class StartStream(TemplateView):
+class StartStream(View):
 
     def post(self, request, *args, **kwargs):
         try:
@@ -64,7 +64,7 @@ class StartStream(TemplateView):
         return JsonResponse({"success": True, "message": "Stream is starting."})
 
 
-class StopStream(TemplateView):
+class StopStream(View):
 
     def post(self, request, *args, **kwargs):
         try:
