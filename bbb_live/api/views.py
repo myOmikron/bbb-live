@@ -56,7 +56,7 @@ class StartStream(View):
                 {"success": False, "message": "You didn't passed the checksum check"},
                 status=401
             )
-        if Process.is_running:
+        if Process.is_running():
             return JsonResponse(
                 {"success": False, "message": "There is already a meeting running on this server"},
                 status=503
