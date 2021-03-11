@@ -16,7 +16,7 @@ logger = logging.getLogger("streamer")
 
 
 class Streamer:
-    def __init__(self):
+    def stream(self, bbb_join_url, display, stream_address):
         options = ChromeOptions()
         options.add_argument("--kiosk")
         options.add_experimental_option("excludeSwitches", ["enable-automation"])
@@ -29,8 +29,6 @@ class Streamer:
 
         logger.info("Started selenium controller browser")
         self.driver = webdriver.Chrome(options=options)
-
-    def stream(self, bbb_join_url, display, stream_address):
 
         self.driver.get(bbb_join_url)
 
