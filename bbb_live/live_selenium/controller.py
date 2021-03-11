@@ -70,7 +70,8 @@ class Streamer:
                 break
 
         logger.info("Start ffmpeg")
-        subprocess.run(f'ffmpeg -thread_queue_size 1024 -f x11grab -draw_mouse 0 -s 1920x1080 -i :{display} -thread_queue_size 1024  -f pulse -i default -ac 2 -c:a aac -b:a 160k -ar 44100 -threads 0 -c:v libx264 -x264-params "nal-hrd=cbr" -profile:v high -level:v 4.2 -vf format=yuv420p -b:v "4000k" -maxrate "4000k" -minrate "2000k" -bufsize "8000k" -g 60 -preset ultrafast -f flv -flvflags no_duration_filesize "{stream_address}"', shell=True)
+        self.process = subprocess.Popen(f'ffmpeg -thread_queue_size 1024 -f x11grab -draw_mouse 0 -s 1920x1080 -i :{display} -thread_queue_size 1024  -f pulse -i default -ac 2 -c:a aac -b:a 160k -ar 44100 -threads 0 -c:v libx264 -x264-params "nal-hrd=cbr" -profile:v high -level:v 4.2 -vf format=yuv420p -b:v "4000k" -maxrate "4000k" -minrate "2000k" -bufsize "8000k" -g 60 -preset ultrafast -f flv -flvflags no_duration_filesize "{stream_address}"', shell=True)
+        self.process.communicate()
 
     def start_browser(self, meeting_id, password, stream_address, bbb_url, bbb_secret):
         b = BigBlueButton(bbb_url, bbb_secret)
@@ -88,6 +89,7 @@ class Streamer:
             self.stream(uri, disp.display, stream_address)
 
     def stop(self):
+        self.process.terminate()
         self.driver.close()
 
 
