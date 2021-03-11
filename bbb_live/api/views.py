@@ -8,7 +8,6 @@ from django.http import JsonResponse
 from django.views.generic.base import View
 from rc_protocol import validate_checksum
 
-from api.models import Streaming
 from bbb_live import settings
 
 
@@ -24,6 +23,11 @@ class Process:
     @classmethod
     def stop_stream(cls):
         cls.process.send_signal(signal.SIGINT)
+        del cls.process
+
+    @classmethod
+    def is_running(cls):
+        return hasattr(cls, "process")
 
 
 def check_required_parameter(param_list, data):
@@ -52,14 +56,11 @@ class StartStream(View):
                 {"success": False, "message": "You didn't passed the checksum check"},
                 status=401
             )
-        if Streaming.objects.first().running:
+        if Process.is_running:
             return JsonResponse(
                 {"success": False, "message": "There is already a meeting running on this server"},
                 status=503
             )
-        streaming = Streaming.objects.first()
-        streaming.running = True
-        streaming.save()
         Process.start_stream(data)
 
         return JsonResponse({"success": True, "message": "Stream is starting."})
@@ -83,10 +84,6 @@ class StopStream(View):
                 {"success": False, "message": "You didn't passed the checksum check"},
                 status=401
             )
-        stream = Streaming.objects.first()
-        stream.running = False
-        stream.save()
-
         Process.stop_stream()
 
         return JsonResponse({"success": True, "message": "Stream was stopped."})
