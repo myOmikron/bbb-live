@@ -1,5 +1,6 @@
 import argparse
 import logging
+import os
 import signal
 import subprocess
 
@@ -89,7 +90,7 @@ class Streamer:
             self.stream(uri, disp.display, stream_address)
 
     def stop(self):
-        self.process.terminate()
+        os.system(f"kill -9 {self.process.pid}")
         self.driver.close()
 
 
