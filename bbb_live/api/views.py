@@ -1,5 +1,6 @@
 import json
 import os
+import shlex
 import signal
 import subprocess
 import sys
@@ -18,7 +19,8 @@ class Process:
               f"--bbb-url '{settings.BBB_URL}' --bbb-secret '{settings.BBB_SECRET}' " \
               f"--stream-address '{data['rtmp_uri']}' --meeting-id '{data['meeting_id']}' "\
               f"--meeting-password '{data['meeting_password']}'"
-        cls.process = subprocess.Popen(cmd, shell=True)
+        cmd = shlex.split(cmd)
+        cls.process = subprocess.Popen(cmd)
 
     @classmethod
     def stop_stream(cls):

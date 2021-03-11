@@ -1,6 +1,7 @@
 import argparse
 import logging
 import os
+import shlex
 import signal
 import subprocess
 
@@ -61,7 +62,7 @@ class Streamer:
         self.driver.execute_script(remove_toastify)
 
         for i in range(3):
-            p = subprocess.run(f'pusleaudio --check', shell=True)
+            p = subprocess.run(f'pulseaudio --check', shell=True)
             if p.returncode != 0:
                 logger.error("Pulseaudio hasn't started yet. Starting it")
                 subprocess.run("pulseaudio --kill", shell=True)
@@ -71,7 +72,9 @@ class Streamer:
                 break
 
         logger.info("Start ffmpeg")
-        self.process = subprocess.Popen(f'ffmpeg -thread_queue_size 1024 -f x11grab -draw_mouse 0 -s 1920x1080 -i :{display} -thread_queue_size 1024  -f pulse -i default -ac 2 -c:a aac -b:a 160k -ar 44100 -threads 0 -c:v libx264 -x264-params "nal-hrd=cbr" -profile:v high -level:v 4.2 -vf format=yuv420p -b:v "4000k" -maxrate "4000k" -minrate "2000k" -bufsize "8000k" -g 60 -preset ultrafast -f flv -flvflags no_duration_filesize "{stream_address}"', shell=True)
+        cmd = f'ffmpeg -thread_queue_size 1024 -f x11grab -draw_mouse 0 -s 1920x1080 -i :{display} -thread_queue_size 1024  -f pulse -i default -ac 2 -c:a aac -b:a 160k -ar 44100 -threads 0 -c:v libx264 -x264-params "nal-hrd=cbr" -profile:v high -level:v 4.2 -vf format=yuv420p -b:v "4000k" -maxrate "4000k" -minrate "2000k" -bufsize "8000k" -g 60 -preset ultrafast -f flv -flvflags no_duration_filesize "{stream_address}"'
+        cmd = shlex.split(cmd)
+        self.process = subprocess.Popen(cmd)
         self.process.communicate()
 
     def start_browser(self, meeting_id, password, stream_address, bbb_url, bbb_secret):
