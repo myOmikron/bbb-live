@@ -46,7 +46,8 @@ class StartStream(View):
         check_result = check_required_parameter(["rtmp_uri", "meeting_id", "meeting_password", "checksum"], data)
         if not check_result["success"]:
             return JsonResponse(check_result, status=400)
-        if not validate_checksum(data, settings.SHARED_SECRET, "startStream", settings.SHARED_SECRET_TIME_DELTA):
+        if not validate_checksum(data, settings.SHARED_SECRET, salt="startStream",
+                                 time_delta=settings.SHARED_SECRET_TIME_DELTA):
             return JsonResponse(
                 {"success": False, "message": "You didn't passed the checksum check"},
                 status=401
@@ -77,7 +78,7 @@ class StopStream(View):
         check_result = check_required_parameter(["meeting_id", "checksum"], data)
         if not check_result["success"]:
             return JsonResponse(check_result, status=400)
-        if not validate_checksum(data, settings.SHARED_SECRET, "starStream", settings.SHARED_SECRET_TIME_DELTA):
+        if not validate_checksum(data, settings.SHARED_SECRET, "stopStream", settings.SHARED_SECRET_TIME_DELTA):
             return JsonResponse(
                 {"success": False, "message": "You didn't passed the checksum check"},
                 status=401
