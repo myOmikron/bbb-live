@@ -22,7 +22,7 @@ class Process:
 
     @classmethod
     def stop_stream(cls):
-        cls.process.send_signal(signal.SIGINT)
+        cls.process.send_signal(signal.SIGTERM)
         del cls.process
 
     @classmethod
