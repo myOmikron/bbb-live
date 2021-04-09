@@ -1,4 +1,3 @@
-import json
 import os
 import shlex
 import signal
@@ -6,8 +5,7 @@ import subprocess
 import sys
 
 from django.http import JsonResponse
-from django.views.generic.base import View
-from rc_protocol import validate_checksum
+from bbb_common_api.views import PostApiPoint
 
 from bbb_live import settings
 
@@ -39,53 +37,28 @@ def check_required_parameter(param_list, data):
     return {"success": True}
 
 
-class StartStream(View):
+class StartStream(PostApiPoint):
 
-    def post(self, request, *args, **kwargs):
-        try:
-            data = json.loads(request.body)
-        except json.JSONDecodeError:
-            return JsonResponse(
-                {"success": False, "message": "Couldn't decode json"},
-                status=400
-            )
-        check_result = check_required_parameter(["rtmp_uri", "meeting_id", "meeting_password", "checksum"], data)
-        if not check_result["success"]:
-            return JsonResponse(check_result, status=400)
-        if not validate_checksum(data, settings.SHARED_SECRET, salt="startStream",
-                                 time_delta=settings.SHARED_SECRET_TIME_DELTA):
-            return JsonResponse(
-                {"success": False, "message": "You didn't passed the checksum check"},
-                status=401
-            )
+    endpoint = "startStream"
+    required_parameters = ["rtmp_uri", "meeting_id", "meeting_password"]
+
+    def safe_post(self, request, parameters, *args, **kwargs):
         if Process.is_running():
             return JsonResponse(
                 {"success": False, "message": "There is already a meeting running on this server"},
                 status=503
             )
-        Process.start_stream(data)
+        Process.start_stream(parameters)
 
         return JsonResponse({"success": True, "message": "Stream is starting."})
 
 
-class StopStream(View):
+class StopStream(PostApiPoint):
 
-    def post(self, request, *args, **kwargs):
-        try:
-            data = json.loads(request.body)
-        except json.JSONDecodeError:
-            return JsonResponse(
-                {"success": False, "message": "Couldn't decode json"},
-                status=400
-            )
-        check_result = check_required_parameter(["meeting_id", "checksum"], data)
-        if not check_result["success"]:
-            return JsonResponse(check_result, status=400)
-        if not validate_checksum(data, settings.SHARED_SECRET, "stopStream", settings.SHARED_SECRET_TIME_DELTA):
-            return JsonResponse(
-                {"success": False, "message": "You didn't passed the checksum check"},
-                status=401
-            )
+    endpoint = "stopStream"
+    required_parameters = ["meeting_id"]
+
+    def safe_post(self, request, parameters, *args, **kwargs):
         Process.stop_stream()
 
         return JsonResponse({"success": True, "message": "Stream was stopped."})
