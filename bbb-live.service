@@ -5,7 +5,7 @@ Description=BBB-Live Streaming service
 WantedBy=multi-user.target
 
 [Service]
-ExecStart=/home/live/bbb-live/venv/bin/python3 manage.py runserver 127.0.0.1:8000
+ExecStart=/home/live/bbb-live/venv/bin/python3 manage.py runserver 127.0.0.1:8006
 User=live
 WorkingDirectory=/home/live/bbb-live/bbb_live/
 Restart=always
