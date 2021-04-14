@@ -72,7 +72,8 @@ class Streamer:
                 break
 
         logger.info("Start ffmpeg")
-        cmd = f'ffmpeg -thread_queue_size 1024 -framerate 30 -f x11grab -draw_mouse 0 -s 1920x1080 -i :{display} -thread_queue_size 1024 -f pulse -i default -ac 1 -c:a aac -b:a 160k -ar 44100 -threads 0 -c:v libx264 -profile:v baseline -pix_fmt yuv420p -f flv "{stream_address}"'
+        #cmd = f'ffmpeg -thread_queue_size 1024 -framerate 30 -f x11grab -draw_mouse 0 -s 1920x1080 -i :{display} -thread_queue_size 1024 -f pulse -i default -ac 1 -c:a aac -b:a 160k -ar 44100 -threads 0 -c:v libx264 -profile:v baseline -pix_fmt yuv420p -f flv "{stream_address}"'
+        cmd = f'ffmpeg -thread_queue_size 1024 -f x11grab -draw_mouse 0 -s 1920x1080 -i :{display} -thread_queue_size 1024 -f pulse -i default -ac 2 -c:a aac -b:a 160k -ar 44100 -threads 0 -c:v libx264 -x264-params "nal-hrd=cbr" -profile:v high -level:v 4.2 -vf format=yuv420p -b:v "3500k" -maxrate "3500k" -minrate "1750k" -bufsize "7000k" -g 60 -preset ultrafast -f flv "{stream_address}"'
         cmd = shlex.split(cmd)
         self.process = subprocess.Popen(cmd)
         self.process.communicate()
