@@ -19,6 +19,16 @@ logger = logging.getLogger("streamer")
 
 class Streamer:
     def stream(self, bbb_join_url, display, stream_address):
+        for i in range(3):
+            p = subprocess.run(f'pulseaudio --check', shell=True)
+            if p.returncode != 0:
+                logger.error("Pulseaudio hasn't started yet. Starting it")
+                subprocess.run("pulseaudio --kill", shell=True)
+                subprocess.run("pulseaudio -D", shell=True)
+            else:
+                logger.info("Pulseaudio is already running.")
+                break
+
         options = ChromeOptions()
         options.add_argument("--kiosk")
         options.add_experimental_option("excludeSwitches", ["enable-automation"])
@@ -60,16 +70,6 @@ class Streamer:
         remove_toastify = 'x=document.createElement("style");x.innerText=".Toastify__toast-container--top-right {display: '\
                           'none;}";document.body.appendChild(x);'
         self.driver.execute_script(remove_toastify)
-
-        for i in range(3):
-            p = subprocess.run(f'pulseaudio --check', shell=True)
-            if p.returncode != 0:
-                logger.error("Pulseaudio hasn't started yet. Starting it")
-                subprocess.run("pulseaudio --kill", shell=True)
-                subprocess.run("pulseaudio -D", shell=True)
-            else:
-                logger.info("Pulseaudio is already running.")
-                break
 
         logger.info("Start ffmpeg")
         #cmd = f'ffmpeg -thread_queue_size 1024 -framerate 30 -f x11grab -draw_mouse 0 -s 1920x1080 -i :{display} -thread_queue_size 1024 -f pulse -i default -ac 1 -c:a aac -b:a 160k -ar 44100 -threads 0 -c:v libx264 -profile:v baseline -pix_fmt yuv420p -f flv "{stream_address}"'
