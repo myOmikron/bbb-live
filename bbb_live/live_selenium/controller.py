@@ -18,7 +18,7 @@ logger = logging.getLogger("streamer")
 
 
 class Streamer:
-    def stream(self, bbb_join_url, display, stream_address):
+    def stream(self, bbb_join_url, display, stream_address, hide_presentation):
         for i in range(3):
             p = subprocess.run(f'pulseaudio --check', shell=True)
             if p.returncode != 0:
@@ -64,7 +64,10 @@ class Streamer:
 
         # Remove hide presentation button
         x = self.driver.find_element_by_xpath("//button[@aria-label='Hide presentation']")
-        self.driver.execute_script(f'document.getElementById("{x.get_attribute("id")}").style.display = "none";')
+        if hide_presentation:
+            x.click()
+        else:
+            self.driver.execute_script(f'document.getElementById("{x.get_attribute("id")}").style.display = "none";')
 
         # Remove notifications
         remove_toastify = 'x=document.createElement("style");x.innerText=".Toastify__toast-container--top-right {display: '\
@@ -78,7 +81,7 @@ class Streamer:
         self.process = subprocess.Popen(cmd)
         self.process.communicate()
 
-    def start_browser(self, meeting_id, password, stream_address, bbb_url, bbb_secret):
+    def start_browser(self, meeting_id, password, stream_address, bbb_url, bbb_secret, hide_presentation):
         b = BigBlueButton(bbb_url, bbb_secret)
         params = {
             "userdata-bbb_auto_join_audio": "true",
@@ -91,7 +94,7 @@ class Streamer:
         from pyvirtualdisplay import Display
         with Display(size=(1920, 1080), color_depth=24) as disp:
             logger.info("Started virtual display")
-            self.stream(uri, disp.display, stream_address)
+            self.stream(uri, disp.display, stream_address, hide_presentation)
 
     def stop(self):
         os.system(f"kill -9 {self.process.pid}")
@@ -110,8 +113,12 @@ if __name__ == '__main__':
     parser.add_argument("--stream-address", help="Address of the stream", required=True)
     parser.add_argument("--bbb-url", help="BBB url", required=True)
     parser.add_argument("--bbb-secret", help="BBB shared secret", required=True)
+    parser.add_argument("--hide-presentation", action="store_true", help="Specify True to hide the presentation")
     args = parser.parse_args()
     streamer = Streamer()
 
     signal.signal(signal.SIGTERM, handle_sigterm)
-    streamer.start_browser(args.meeting_id, args.meeting_password, args.stream_address, args.bbb_url, args.bbb_secret)
+    streamer.start_browser(
+        args.meeting_id, args.meeting_password, args.stream_address, args.bbb_url, args.bbb_secret,
+        args.hide_presentation
+    )

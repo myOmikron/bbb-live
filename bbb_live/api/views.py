@@ -16,7 +16,8 @@ class Process:
         cmd = f"{sys.executable} {os.path.join(settings.BASE_DIR, 'live_selenium', 'controller.py')} " \
               f"--bbb-url '{settings.BBB_URL}' --bbb-secret '{settings.BBB_SECRET}' " \
               f"--stream-address '{data['rtmp_uri']}' --meeting-id '{data['meeting_id']}' "\
-              f"--meeting-password '{data['meeting_password']}'"
+              f"--meeting-password '{data['meeting_password']}' "\
+              f"{'--hide-presentation' if data['hide_presentation'] else ''}"
         cmd = shlex.split(cmd)
         cls.process = subprocess.Popen(cmd)
 

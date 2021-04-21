@@ -16,11 +16,12 @@ checksum as key "checksum". The checksum is required at every endpoint.
 This endpoint starts a stream for a given BBB Meeting to a target rtmp address.
 As for now, only one stream can be running at the same time.
 
-Parameter        | Description
----              | ---
-rtmp_uri         | RTMP Address of the target server
-meeting_id       | BBB Meeting ID
-meeting_password | BBB Meeting Attendee or Moderator Password
+Parameter         | Optional | Type | Description
+---               | ---      | ---  | ---
+rtmp_uri          | No       | str  | RTMP Address of the target server
+meeting_id        | No       | str  | BBB Meeting ID
+meeting_password  | No       | str  | BBB Meeting Attendee or Moderator Password
+hide_presentation | Yes      | bool | If specified True, the presentation will be hidden
 
 
 ### stopStream
