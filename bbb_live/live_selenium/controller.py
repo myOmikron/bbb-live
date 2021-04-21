@@ -8,7 +8,7 @@ import subprocess
 from bigbluebutton_api_python import BigBlueButton
 
 from selenium import webdriver
-from selenium.webdriver import ChromeOptions
+from selenium.webdriver import ChromeOptions, ActionChains
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions
 from selenium.webdriver.support.wait import WebDriverWait
@@ -65,7 +65,8 @@ class Streamer:
         # Remove hide presentation button
         x = self.driver.find_element_by_xpath("//button[@aria-label='Hide presentation']")
         if hide_presentation:
-            x.click()
+            actions = ActionChains(self.driver)
+            actions.move_to_element(x).perform()
         else:
             self.driver.execute_script(f'document.getElementById("{x.get_attribute("id")}").style.display = "none";')
 
