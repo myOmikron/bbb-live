@@ -8,7 +8,7 @@ import subprocess
 from bigbluebutton_api_python import BigBlueButton
 
 from selenium import webdriver
-from selenium.webdriver import ChromeOptions, ActionChains
+from selenium.webdriver import ChromeOptions
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions
 from selenium.webdriver.support.wait import WebDriverWait
@@ -62,18 +62,17 @@ class Streamer:
         # Remove header
         self.driver.execute_script('document.querySelector(\'header\').style.display = "none";')
 
+        # Remove notifications
+        remove_toastify = 'x=document.createElement("style");x.innerText=".Toastify {display: '\
+                          'none;}";document.body.appendChild(x);'
+        self.driver.execute_script(remove_toastify)
+
         # Remove hide presentation button
         x = self.driver.find_element_by_xpath("//button[@aria-label='Hide presentation']")
         if hide_presentation:
-            actions = ActionChains(self.driver)
-            actions.move_to_element(x).perform()
+            x.click()
         else:
             self.driver.execute_script(f'document.getElementById("{x.get_attribute("id")}").style.display = "none";')
-
-        # Remove notifications
-        remove_toastify = 'x=document.createElement("style");x.innerText=".Toastify__toast-container--top-right {display: '\
-                          'none;}";document.body.appendChild(x);'
-        self.driver.execute_script(remove_toastify)
 
         logger.info("Start ffmpeg")
         #cmd = f'ffmpeg -thread_queue_size 1024 -framerate 30 -f x11grab -draw_mouse 0 -s 1920x1080 -i :{display} -thread_queue_size 1024 -f pulse -i default -ac 1 -c:a aac -b:a 160k -ar 44100 -threads 0 -c:v libx264 -profile:v baseline -pix_fmt yuv420p -f flv "{stream_address}"'
