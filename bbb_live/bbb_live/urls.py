@@ -18,6 +18,6 @@ from django.urls import path
 from api.views import StartStream, StopStream
 
 urlpatterns = [
-    path("startStream", StartStream.as_view()),
-    path("stopStream", StopStream.as_view()),
+    path("/api/v1/startStream", StartStream.as_view()),
+    path("/api/v1/stopStream", StopStream.as_view()),
 ]
