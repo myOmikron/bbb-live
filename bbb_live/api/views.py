@@ -17,7 +17,7 @@ class Process:
               f"--bbb-url '{settings.BBB_URL}' --bbb-secret '{settings.BBB_SECRET}' " \
               f"--stream-address '{data['rtmp_uri']}' --meeting-id '{data['meeting_id']}' "\
               f"--meeting-password '{data['meeting_password']}' "\
-              f"{'--hide-presentation' if data['hide_presentation'] else ''}"
+              f"{'--hide-presentation' if 'hide_presentation' in data else ''}"
         cmd = shlex.split(cmd)
         cls.process = subprocess.Popen(cmd)
 
