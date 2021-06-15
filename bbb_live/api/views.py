@@ -47,11 +47,14 @@ class StartStream(PostApiPoint):
         if Process.is_running():
             return JsonResponse(
                 {"success": False, "message": "There is already a meeting running on this server"},
-                status=503
+                status=503,
+                reason="There is already a meeting running on this server"
             )
-        Process.start_stream(parameters)
-
-        return JsonResponse({"success": True, "message": "Stream is starting."})
+        else:
+            Process.start_stream(parameters)
+            return JsonResponse(
+                {"success": True, "message": "Stream is starting."}
+            )
 
 
 class StopStream(PostApiPoint):
@@ -60,6 +63,14 @@ class StopStream(PostApiPoint):
     required_parameters = ["meeting_id"]
 
     def safe_post(self, request, parameters, *args, **kwargs):
-        Process.stop_stream()
-
-        return JsonResponse({"success": True, "message": "Stream was stopped."})
+        if Process.is_running():
+            Process.stop_stream()
+            return JsonResponse(
+                {"success": True, "message": "Stream was stopped."}
+            )
+        else:
+            return JsonResponse(
+                {"success": False, "message": "There is no meeting running on this server"},
+                status=404,
+                reason="There is no meeting running on this server"
+            )
