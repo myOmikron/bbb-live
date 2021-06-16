@@ -36,4 +36,3 @@ errorlog = "-"
 # [ DEPLOYMENT ]
 # X-Forwarded-For trusted sources, comma seperated
 forwarded_allow_ips = '127.0.0.1'
-    
