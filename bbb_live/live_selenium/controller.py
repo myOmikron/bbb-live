@@ -50,14 +50,11 @@ class Streamer:
         self.driver.find_element_by_xpath("//button[@aria-label='Play audio']").click()
 
         # Remove fullscreen buttons
-        x = self.driver.find_element_by_xpath("//button[contains(@class, 'fullScreenButton')]")
+        x = self.driver.find_element_by_xpath("//button[@aria-label='Make Presentation fullscreen']")
         class_name = x.get_attribute("class").split(" ")[-1]
         remove_fullscreen = f'x=document.createElement("style");x.innerText=".{class_name} {{display: none;}}";' \
                             'document.body.appendChild(x);'
         self.driver.execute_script(remove_fullscreen)
-
-        # Remove actions bar
-        self.driver.execute_script('document.querySelector(\'[aria-label="Actions bar"]\').style.display="none";')
 
         # Remove header
         self.driver.execute_script('document.querySelector(\'header\').style.display = "none";')
@@ -68,11 +65,14 @@ class Streamer:
         self.driver.execute_script(remove_toastify)
 
         # Remove hide presentation button
-        x = self.driver.find_element_by_xpath("//button[@aria-label='Hide presentation']")
+        x = self.driver.find_element_by_xpath("//button[@aria-label='Minimize presentation']")
         if hide_presentation:
             x.click()
         else:
             self.driver.execute_script(f'document.getElementById("{x.get_attribute("id")}").style.display = "none";')
+
+        # Remove actions bar
+        self.driver.execute_script('document.querySelector(\'[aria-label="Actions bar"]\').style.display="none";')
 
         logger.info("Start ffmpeg")
         #cmd = f'ffmpeg -thread_queue_size 1024 -framerate 30 -f x11grab -draw_mouse 0 -s 1920x1080 -i :{display} -thread_queue_size 1024 -f pulse -i default -ac 1 -c:a aac -b:a 160k -ar 44100 -threads 0 -c:v libx264 -profile:v baseline -pix_fmt yuv420p -f flv "{stream_address}"'
